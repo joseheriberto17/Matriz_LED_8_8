@@ -1,10 +1,10 @@
 /*
-  Nombre del Archivo: OLED_64_128
-  Descripción: manejo de matriz SSD1306 sin librerias.
-   
+  Nombre del Archivo: Matriz_led_8_8
+  Descripción: manejo de matriz LeD sin librerias con ARDUINO MEGA, conexion directa.
+
 
   Autor: jose heriberto marquez diaz
-  Fecha: 27 de junio 2024
+  Fecha: 14 de julio 2024
 
   Notas:
   - Ninguna
@@ -14,55 +14,75 @@
 
 String mensaje = "";
 bool flag_data = false;
+int flag = 1;
 int numero = 0;
-int pines[2][8] = {{4,5,6,7,8,9,10,11},{22,23,24,25,26,27,28,29}};
+uint8_t count = 0;
+int pines[2][8] = {{4, 5, 6, 7, 8, 9, 10, 11}, {22, 23, 24, 25, 26, 27, 28, 29}}; // columnas , filas
 
+bool data[8][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
+                   {0, 1, 1, 1, 1, 1, 0, 0},
+                   {0, 0, 0, 0, 1, 0, 0, 0},
+                   {0, 0, 0, 0, 1, 0, 0, 0},
+                   {0, 1, 0, 0, 1, 0, 0, 0},
+                   {0, 0, 1, 1, 0, 0, 0, 0},
+                   {0, 0, 0, 0, 0, 0, 0, 0},
+                   {0, 0, 0, 0, 0, 0, 0, 0}};
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
-  pinMode(LED_BUILTIN,OUTPUT);
-  digitalWrite(LED_BUILTIN,LOW);
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
   for (size_t j = 0; j < 2; j++)
   {
     for (size_t i = 0; i < 8; i++)
     {
       pinMode(pines[j][i], OUTPUT);
-      digitalWrite(pines[j][i], 1-j);
+      digitalWrite(pines[j][i], 1 - j);
       // Serial.println(pines[j][i]); // exploracion de los pines
     }
   }
-  
-  
 }
 
-void loop() {
+void loop()
+{
+  for (size_t i = 0; i < 8; i++)
+  {
+    for (size_t j = 0; j < 8; j++)
+    {
+      digitalWrite(pines[0][j],1- data[i][j]);      
+    }
+    digitalWrite(pines[1][i], 1);
+    delay(15 / 8);
+    digitalWrite(pines[1][i], 0);
     
+  }
 
-    if (flag_data == true)
-    {
-      numero = atoi(mensaje.c_str());
-      toogle(numero);
-      Serial.println(String(numero) + " " + String(digitalRead(numero)));
+  if (flag_data == true)
+  {
+    numero = atoi(mensaje.c_str());
+    toogle(numero);
+    Serial.println(String(numero) + " " + String(digitalRead(numero)));
 
-      mensaje = "";
-      flag_data = false;
-      
-    }
+    mensaje = "";
+    flag_data = false;
+  }
 }
 
-void toogle(uint8_t pin){
-    if (digitalRead(pin)==0)
-    {
-        digitalWrite(pin,HIGH);
-    }
-    else
-    {
-        digitalWrite(pin,LOW);
-    }
+void toogle(uint8_t pin)
+{
+  if (digitalRead(pin) == 0)
+  {
+    digitalWrite(pin, HIGH);
+  }
+  else
+  {
+    digitalWrite(pin, LOW);
+  }
 }
 
-
-void serialEvent() {
+void serialEvent()
+{
   while (Serial.available())
   {
     char data = Serial.read();
@@ -72,8 +92,7 @@ void serialEvent() {
     }
     else
     {
-      mensaje+=data;
+      mensaje += data;
     }
-    
   }
 }
